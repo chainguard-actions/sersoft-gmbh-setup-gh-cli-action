@@ -1,0 +1,35 @@
+name: Test specific version install
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          version: "2.50.0"
+      - name: Assert installed-version output matches requested version
+        env:
+          INSTALLED_VERSION: ${{ steps.action.outputs.installed-version }}
+        run: |
+          echo "installed-version: $INSTALLED_VERSION"
+          if [ -z "$INSTALLED_VERSION" ]; then
+            echo "FAIL: installed-version output is empty"
+            exit 1
+          fi
+          if [ "$INSTALLED_VERSION" != "2.50.0" ]; then
+            echo "FAIL: expected installed-version '2.50.0', got '$INSTALLED_VERSION'"
+            exit 1
+          fi
+          echo "PASS: installed-version=$INSTALLED_VERSION"
+      - name: Assert gh CLI reports correct version
+        run: |
+          ACTUAL_VERSION=$(gh --version | head -n1 | awk '{print $3}')
+          echo "gh reported version: $ACTUAL_VERSION"
+          if [ "$ACTUAL_VERSION" != "2.50.0" ]; then
+            echo "FAIL: expected gh version '2.50.0', got '$ACTUAL_VERSION'"
+            exit 1
+          fi
+          echo "PASS"

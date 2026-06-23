@@ -1,0 +1,30 @@
+name: Test with GitHub Token
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          version: stable
+          github-token: ${{ github.token }}
+      - name: Assert installed-version output is set
+        env:
+          ACTUAL: ${{ steps.action.outputs.installed-version }}
+        run: |
+          echo "actual: $ACTUAL"
+          if [ -z "$ACTUAL" ]; then
+            echo "FAIL: installed-version output was empty"
+            exit 1
+          fi
+          echo "PASS: installed-version=$ACTUAL"
+      - name: Assert gh CLI is available
+        run: |
+          if ! command -v gh &>/dev/null; then
+            echo "FAIL: gh CLI not found in PATH"
+            exit 1
+          fi
+          echo "PASS: gh is available at $(command -v gh)"
