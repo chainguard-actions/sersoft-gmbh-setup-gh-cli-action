@@ -8,6 +8,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 
 | Version | Tag | Upstream commit |
 |---------|-----|-----------------|
+| v2.0.1 | [`v2.0.1`](https://github.com/chainguard-actions/sersoft-gmbh-setup-gh-cli-action/tree/v2.0.1) | [`2d02c06`](https://github.com/sersoft-gmbh/setup-gh-cli-action/commit/2d02c06e284b7d55e954d6d6406e7a886f45a818) |
 | v3.0.0 | [`v3.0.0`](https://github.com/chainguard-actions/sersoft-gmbh-setup-gh-cli-action/tree/v3.0.0) | [`3cb41a4`](https://github.com/sersoft-gmbh/setup-gh-cli-action/commit/3cb41a4434ca35de4d1c16e00dc7e16d38409494) |
 
 ## Privacy
