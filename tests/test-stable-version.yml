@@ -1,0 +1,41 @@
+name: Test stable version install
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          version: stable
+      - name: Assert installed-version output is set
+        env:
+          INSTALLED_VERSION: ${{ steps.action.outputs.installed-version }}
+        run: |
+          echo "installed-version: $INSTALLED_VERSION"
+          if [ -z "$INSTALLED_VERSION" ]; then
+            echo "FAIL: installed-version output is empty"
+            exit 1
+          fi
+          echo "PASS: installed-version=$INSTALLED_VERSION"
+      - name: Assert gh CLI is available
+        run: |
+          if ! command -v gh &>/dev/null; then
+            echo "FAIL: gh command not found in PATH"
+            exit 1
+          fi
+          echo "PASS: gh is available at $(command -v gh)"
+      - name: Assert gh version matches output
+        env:
+          INSTALLED_VERSION: ${{ steps.action.outputs.installed-version }}
+        run: |
+          GH_VERSION=$(gh --version | head -n1 | awk '{print $3}')
+          echo "gh reported version: $GH_VERSION"
+          echo "installed-version output: $INSTALLED_VERSION"
+          if [ "$GH_VERSION" != "$INSTALLED_VERSION" ]; then
+            echo "FAIL: gh version '$GH_VERSION' does not match installed-version output '$INSTALLED_VERSION'"
+            exit 1
+          fi
+          echo "PASS"
