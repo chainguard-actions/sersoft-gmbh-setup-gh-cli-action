@@ -1,0 +1,1 @@
+# sersoft-gmbh-setup-gh-cli-action
