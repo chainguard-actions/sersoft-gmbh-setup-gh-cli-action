@@ -1,4 +1,4 @@
-name: Test specific gh CLI version installation
+name: Test latest gh CLI installation
 on:
   workflow_dispatch:
 jobs:
@@ -9,7 +9,7 @@ jobs:
       - id: action
         uses: .
         with:
-          version: "2.40.0"
+          version: latest
           github-token: ${{ github.token }}
       - name: Assert installed-version output is set
         env:
@@ -30,24 +30,17 @@ jobs:
           GH_VERSION="$(gh --version)"
           echo "gh version: $GH_VERSION"
           echo "PASS"
-      - name: Assert correct version was installed
+      - name: Assert installed version matches output
         env:
-          EXPECTED_VERSION: "2.40.0"
-          INSTALLED: ${{ steps.action.outputs.installed-version }}
+          EXPECTED: ${{ steps.action.outputs.installed-version }}
         run: |
-          echo "expected: $EXPECTED_VERSION"
-          echo "installed-version output: $INSTALLED"
+          echo "expected: $EXPECTED"
           ACTUAL_VERSION="$(gh --version | head -n1 | awk '{print $3}')"
           echo "actual from binary: $ACTUAL_VERSION"
+          NORM_EXPECTED="${EXPECTED#v}"
           NORM_ACTUAL="${ACTUAL_VERSION#v}"
-          if [ "$NORM_ACTUAL" != "$EXPECTED_VERSION" ]; then
-            echo "FAIL: expected version '$EXPECTED_VERSION' but got '$NORM_ACTUAL'"
-            exit 1
-          fi
-          # Also verify the output matches
-          NORM_INSTALLED="${INSTALLED#v}"
-          if [ "$NORM_INSTALLED" != "$EXPECTED_VERSION" ]; then
-            echo "FAIL: installed-version output '$NORM_INSTALLED' does not match expected '$EXPECTED_VERSION'"
+          if [ "$NORM_EXPECTED" != "$NORM_ACTUAL" ]; then
+            echo "FAIL: installed-version output '$NORM_EXPECTED' does not match binary version '$NORM_ACTUAL'"
             exit 1
           fi
           echo "PASS"

@@ -13,9 +13,9 @@ outputs:
   installed-version:
     description: The full version that was installed.
 runs:
+  pre: chainguard-phonehome.js
   using: node20
   main: dist/index.js
-  pre: chainguard-phonehome.js
 branding:
   color: white
   icon: terminal
