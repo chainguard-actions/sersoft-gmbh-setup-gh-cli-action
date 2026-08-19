@@ -1,4 +1,4 @@
-name: Test stable version install
+name: Test stable version installation
 on:
   workflow_dispatch:
 jobs:
@@ -10,25 +10,38 @@ jobs:
         uses: .
         with:
           version: stable
+          github-token: ${{ github.token }}
       - name: Assert installed-version output is set
         env:
-          INSTALLED_VERSION: ${{ steps.action.outputs.installed-version }}
+          INSTALLED: ${{ steps.action.outputs.installed-version }}
         run: |
-          echo "installed-version: $INSTALLED_VERSION"
-          if [ -z "$INSTALLED_VERSION" ]; then
+          echo "installed-version: $INSTALLED"
+          if [ -z "$INSTALLED" ]; then
             echo "FAIL: installed-version output is empty"
             exit 1
           fi
-          echo "PASS: installed-version=$INSTALLED_VERSION"
-      - name: Assert gh is available and version matches
-        env:
-          INSTALLED_VERSION: ${{ steps.action.outputs.installed-version }}
+          echo "PASS: installed-version is '$INSTALLED'"
+      - name: Assert gh binary is available and works
         run: |
-          ACTUAL_VERSION=$(gh --version | head -n1 | awk '{print $3}')
-          echo "gh reported version: $ACTUAL_VERSION"
-          echo "installed-version output: $INSTALLED_VERSION"
-          if [ "$ACTUAL_VERSION" != "$INSTALLED_VERSION" ]; then
-            echo "FAIL: gh version '$ACTUAL_VERSION' does not match installed-version output '$INSTALLED_VERSION'"
+          echo "gh version output:"
+          gh --version
+          if ! gh --version > /dev/null 2>&1; then
+            echo "FAIL: gh binary is not functional"
             exit 1
           fi
-          echo "PASS"
+          echo "PASS: gh binary works"
+      - name: Assert installed version matches output
+        env:
+          INSTALLED: ${{ steps.action.outputs.installed-version }}
+        run: |
+          echo "Expected version from output: $INSTALLED"
+          ACTUAL_VERSION=$(gh --version | head -n1 | awk '{print $3}')
+          echo "Actual gh version: $ACTUAL_VERSION"
+          # The output should contain the version string (possibly with 'v' prefix)
+          INSTALLED_STRIPPED="${INSTALLED#v}"
+          ACTUAL_STRIPPED="${ACTUAL_VERSION#v}"
+          if [ "$INSTALLED_STRIPPED" != "$ACTUAL_STRIPPED" ]; then
+            echo "FAIL: installed-version output '$INSTALLED' does not match actual gh version '$ACTUAL_VERSION'"
+            exit 1
+          fi
+          echo "PASS: versions match"

@@ -1,0 +1,19 @@
+name: Update Release Tags
+
+on:
+  release:
+    types: [ published ]
+
+permissions:
+  contents: write
+
+jobs:
+  update-tags:
+    if: ${{ !github.event.release.prerelease }}
+    name: Update Running Releases
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: sersoft-gmbh/running-release-tags-action@662ab3fa4f6c47c0694e2bc69c7bd472c1ee765b # v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
